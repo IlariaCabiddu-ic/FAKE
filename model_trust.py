@@ -1,40 +1,40 @@
 import collections
 
-def compute_expertise(sub_df, topics):
+
+def compute_expertise(df, topics):
     alfa = 0.5
     beta = 0.5
-    M_st = []
     Q_st = []
-    expertise = []
+    q = []
+    dictionary_Q = {}
+
     '''computation of M_st that is a percentage number of published news items 
         of a specific topic compared to the total number of news items of a source'''
-    M_st = sub_df['Topic'].to_list()
-    M_st = collections.Counter(M_st)
-    sum_p = sum(M_st.values())
-    for t in range(len(M_st)):
-        M_st[t] = float(M_st[t]/sum_p)
 
-    expertise = alfa * M_st + beta * Q_st
+    "Compute focus theme M_st "
+    M_st = df['Topic'].to_list()
+    M_st = dict(collections.Counter(M_st))
+    # print(M_st)
+    "Number of total news"
+    N_s = sum(M_st.values())
+    # print(N_s)
+    for i in M_st:
+        M_st[i] = float(round(M_st[i]/N_s, 4))
+    # print(M_st)
 
-    '''import pandas as pd
-import collections
-
-empoyees = [('jack', 34, 'Sydney', 5) ,
-         ('Riti', 31, 'Delhi' , 7) ,
-         ('Aadi', 16, 'Sydney', 11) ,
-         ('Mohit', 31,'Delhi' , 7) ,
-         ('Veena', 31, 'Delhi' , 4) ,
-         ('Shaunak', 35, 'Mumbai', 5 ),
-         ('Shaun', 35, 'Colombo', 11)
-          ]
-# Create a DataFrame object
-sub_df = pd.DataFrame(empoyees, columns=['Name', 'Age', 'City', 'Experience'])
-sub_sub = sub_df['City'].to_list()
-
-frequency_topic=dict(collections.Counter(sub_sub))
-print(frequency_topic)
-sum_p = sum(frequency_topic.values())
-print(sum_p)
-for t in frequency_topic:
-    frequency_topic[t]=float(frequency_topic[t]/sum_p)
-print(frequency_topic)'''
+    "Compute technicality Q_st"
+    for t in topics:
+        df_sub = df[df['Topic'] == t]
+        # print(df_sub)
+        for j in range(df_sub.shape[0]):
+            # print((df_sub['Unique_word']- df_sub['Typos'])/ df_sub['n_words'])
+            q = sum((df_sub['Unique_word'] - df_sub['Typos']) / df_sub['n_words'])
+            # print(q)
+        # q = sum(q)
+        Q_st.append(q)
+        dictionary_Q[t] = q
+    # print(dictionary_Q)
+    zipped_lists = zip(list(M_st.values()), Q_st)
+    expertise = [alfa*x + beta*y for (x, y) in zipped_lists]
+    expertise = [round(x, 2) for x in expertise]
+    return expertise
