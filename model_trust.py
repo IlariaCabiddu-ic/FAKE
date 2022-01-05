@@ -20,7 +20,7 @@ def compute_expertise(df, topics):
     # print(N_s)
     for i in M_st:
         M_st[i] = float(round(M_st[i]/N_s, 4))
-    # print(M_st)
+    print(M_st)
 
     "Compute technicality Q_st"
     for t in topics:
@@ -29,9 +29,10 @@ def compute_expertise(df, topics):
         for j in range(df_sub.shape[0]):
             # print((df_sub['Unique_word']- df_sub['Typos'])/ df_sub['n_words'])
             q = sum((df_sub['Unique_word'] - df_sub['Typos']) / df_sub['n_words'])
-            # print(q)
+        print(q)
         # q = sum(q)
-        Q_st.append(q)
+        print(df_sub.shape[0])
+        Q_st.append(q/(df_sub.shape[0]+1))  # divide by number of topic news P_st
         dictionary_Q[t] = q
     # print(dictionary_Q)
     zipped_lists = zip(list(M_st.values()), Q_st)
