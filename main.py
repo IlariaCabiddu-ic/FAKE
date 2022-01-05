@@ -2,6 +2,7 @@
 import pandas as pd
 import model_trust
 
+
 df_new = pd.read_json('path_of_the_file.json') # if we have a online repository, we can use the URL, df= pd.read_json(URL)
 # visualization of info dataframe (optional)
 df_new.info()
@@ -35,7 +36,9 @@ if TLD in TLDs:
     print("This source is trusted!!!\n")
 else:
     print("This source needs to be analysed\n")
-    # STEP THREE Detection of all topic
+    # STEP THREE Detection of all topic (optional maybe)
     topics = sub_df['Topic'].unique()
 
     """--------------- MODEL TRUST ---------------------"""
+    expertise = model_trust.compute_expertise(df=sub_df, topics=topics)
+    print(expertise)
