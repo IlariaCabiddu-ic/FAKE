@@ -39,3 +39,4 @@ def compute_expertise(df, topics):
     expertise = [alfa*x + beta*y for (x, y) in zipped_lists]
     expertise = [round(x, 2) for x in expertise]
     return expertise
+
