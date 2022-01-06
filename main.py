@@ -40,5 +40,13 @@ else:
     topics = sub_df['Topic'].unique()
 
     """--------------- MODEL TRUST ---------------------"""
+    "Computation of the source expertise"
     expertise = model_trust.compute_expertise(df=sub_df, topics=topics)
     print(expertise)
+    "Computation of the news relevance"
+    relevance = model_trust.compute_relevance(df=sub_df)
+    print(relevance)
+    "Computation of the source goodwill"
+    goodwill = model_trust.compute_goodwill(df=sub_df, topics=topics, relevance=relevance)
+    print("The goodwill of analysed source is: ", goodwill)
+    
