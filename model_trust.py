@@ -1,4 +1,8 @@
 import collections
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import geom
+import numpy as np
 
 
 def compute_expertise(df, topics):
@@ -29,7 +33,7 @@ def compute_expertise(df, topics):
         # print(df_sub)
         for j in range(df_sub.shape[0]):
             # print((df_sub['Unique_word']- df_sub['Typos'])/ df_sub['n_words'])
-            q = sum((df_sub['Unique_word'] - df_sub['Typos']) / df_sub['n_words'])
+            q = sum(df_sub['Message_based'])
         # print(q)
         # q = sum(q)
         # print(df_sub.shape[0])
@@ -69,3 +73,53 @@ def compute_goodwill(df, topics, relevance):
         dictionary_G[t] = g / (df_sub.shape[0])
     # print(dictionary_G)
     return dictionary_G
+
+
+def compute_historical(df, topics):
+    H_st = []
+    dictionary_H = {}
+    df_unique = df.drop_duplicates()
+    datetimes = pd.to_datetime(df_unique['Datetime'])
+    df_unique['Datetime'] = datetimes
+    for t in topics:
+        df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
+        df_sub = df_sub.set_index('Datetime')
+        df_sub = df_sub.sort_index(ascending=False)
+        # print(t)
+        # print(df_sub)
+        for j in range(df_sub.shape[0]+1):
+            samples = np.arange(1, df_sub.shape[0]+1)
+            p = 0.3
+            # Calculate geometric probability distribution (WITHOUT THE FINITE UPPER BOUND)
+            weight_l = geom.pmf(samples, p)
+            df_sub['Weight_l'] = weight_l
+        # print(df_sub)
+        # Plot the probability distribution
+        # fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+        # ax.plot(samples, weight_l, 'bo', ms=8, label='geom pmf')
+        # plt.ylabel("Probability", fontsize="18")
+        # plt.xlabel("Samples", fontsize="18")
+        # plt.title("Geometric Distribution", fontsize="18")
+        # plt.stem(samples,weight_l)
+        # plt.show()
+        # print(weight_l)
+        h = round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4)
+        H_st.append(h)  # divide by number of topic news P_st
+        dictionary_H[t] = h
+
+    return dictionary_H
+
+
+def compute_trust(expertise, goodwill, historical, topics):
+    trust = []
+    sigma = 0.3  # weight for expertise metric
+    omega = 0.2  # weight for historical metric
+    gamma = 0.5  # weight for goodwill metric
+    e = [x * sigma for x in list(expertise.values())]
+    g = [x * gamma for x in list(goodwill.values())]
+    h = [x * omega for x in list(historical.values())]
+    print(g)
+    for i in range(len(topics)):
+        trust[i] = e[i] + g[i] + h[i]
+
+    return trust
