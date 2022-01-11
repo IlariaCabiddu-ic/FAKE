@@ -3,13 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import geom
 import numpy as np
+import seaborn as sns
 
 
 def compute_expertise(df, topics):
     alfa = 0.5
     beta = 0.5
     Q_st = []
-    q = []
     dictionary_Q = {}
     dictionary_E = {}
 
@@ -27,9 +27,14 @@ def compute_expertise(df, topics):
     "Compute technicality Q_st"
     for t in topics:
         df_sub = df[df['Topic'] == t]  # iteration for the each topic
-        q = sum(df_sub['Message_based'])
-        Q_st.append(q / (df_sub.shape[0]))  # divide by number of topic news P_st
-        dictionary_Q[t] = q / (df_sub.shape[0])
+        q = list(df_sub['Message_based'])
+        sns.distplot(q, hist=False)
+        plt.ylabel("Pdf", fontsize="18")
+        plt.xlabel("Expertise samples", fontsize="18")
+        plt.title(("Expertise distribution", t), fontsize="18")
+        plt.show()
+        Q_st.append(sum(df_sub['Message_based']) / (df_sub.shape[0]))  # divide by number of topic news P_st
+        dictionary_Q[t] = sum(df_sub['Message_based']) / (df_sub.shape[0])
     zipped_lists = zip(list(M_st.values()), Q_st)
     expertise = [alfa * x + beta*y for (x, y) in zipped_lists]
     expertise = [round(x, 2) for x in expertise]
@@ -50,11 +55,15 @@ def compute_goodwill(df, topics, relevance):
     dictionary_G = {}
     df_unique = df.drop_duplicates()
     df_unique['Relevance'] = df_unique['ID'].map(relevance)
+    # print(df_unique)
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
+        # print(df_sub)
         g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
+        # print(df_sub.shape[0], g)
         G_st.append(g / (df_sub.shape[0]))  # divide by number of topic news P_st
         dictionary_G[t] = g / (df_sub.shape[0])
+    # print(dictionary_G)
     return dictionary_G
 
 
@@ -73,6 +82,7 @@ def compute_historical(df, topics):
         # Calculate geometric probability distribution (WITHOUT THE FINITE UPPER BOUND)
         weight_l = geom.pmf(samples, p)
         df_sub['Weight_l'] = weight_l
+        # print(df_sub)
         # Plot the probability distribution
         # fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         # ax.plot(samples, weight_l, 'bo', ms=8, label='geom pmf')
@@ -81,6 +91,7 @@ def compute_historical(df, topics):
         # plt.title("Geometric Distribution", fontsize="18")
         # plt.stem(samples,weight_l)
         # plt.show()
+        # print(weight_l)
         h = round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4)
         H_st.append(h)  # divide by number of topic news P_st
         dictionary_H[t] = h
