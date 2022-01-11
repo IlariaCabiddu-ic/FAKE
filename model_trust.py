@@ -1,3 +1,4 @@
+'''-----------Model trust------------'''
 import collections
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,7 +17,7 @@ def compute_expertise(df, topics):
     '''computation of M_st that is a percentage number of published news items 
         of a specific topic compared to the total number of news items of a source'''
     df = df.drop_duplicates()
-    "Compute focus theme M_st "
+    "Compute focus theme M_st"
     M_st = df['Topic'].to_list()
     M_st = dict(collections.Counter(M_st))
     "Number of total news"
@@ -55,15 +56,11 @@ def compute_goodwill(df, topics, relevance):
     dictionary_G = {}
     df_unique = df.drop_duplicates()
     df_unique['Relevance'] = df_unique['ID'].map(relevance)
-    # print(df_unique)
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
-        # print(df_sub)
         g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
-        # print(df_sub.shape[0], g)
         G_st.append(g / (df_sub.shape[0]))  # divide by number of topic news P_st
         dictionary_G[t] = g / (df_sub.shape[0])
-    # print(dictionary_G)
     return dictionary_G
 
 
