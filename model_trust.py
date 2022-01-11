@@ -30,18 +30,12 @@ def compute_expertise(df, topics):
     "Compute technicality Q_st"
     for t in topics:
         df_sub = df[df['Topic'] == t]  # iteration for the each topic
-        # print(df_sub)
-        for j in range(df_sub.shape[0]):
-            # print((df_sub['Unique_word']- df_sub['Typos'])/ df_sub['n_words'])
-            q = sum(df_sub['Message_based'])
+        q = sum(df_sub['Message_based'])
         # print(q)
         # q = sum(q)
         # print(df_sub.shape[0])
         Q_st.append(q / (df_sub.shape[0]))  # divide by number of topic news P_st
-
         dictionary_Q[t] = q / (df_sub.shape[0])
-    # print(Q_st)
-    # print(dictionary_Q)
     zipped_lists = zip(list(M_st.values()), Q_st)
     expertise = [alfa * x + beta*y for (x, y) in zipped_lists]
     expertise = [round(x, 2) for x in expertise]
@@ -66,8 +60,7 @@ def compute_goodwill(df, topics, relevance):
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         # print(df_sub)
-        for j in range(df_sub.shape[0]):
-            g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
+        g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
         # print(df_sub.shape[0], g)
         G_st.append(g / (df_sub.shape[0]))  # divide by number of topic news P_st
         dictionary_G[t] = g / (df_sub.shape[0])
@@ -85,14 +78,11 @@ def compute_historical(df, topics):
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         df_sub = df_sub.set_index('Datetime')
         df_sub = df_sub.sort_index(ascending=False)
-        # print(t)
-        # print(df_sub)
-        for j in range(df_sub.shape[0]+1):
-            samples = np.arange(1, df_sub.shape[0]+1)
-            p = 0.3
-            # Calculate geometric probability distribution (WITHOUT THE FINITE UPPER BOUND)
-            weight_l = geom.pmf(samples, p)
-            df_sub['Weight_l'] = weight_l
+        samples = np.arange(1, df_sub.shape[0]+1)
+        p = 0.3
+        # Calculate geometric probability distribution (WITHOUT THE FINITE UPPER BOUND)
+        weight_l = geom.pmf(samples, p)
+        df_sub['Weight_l'] = weight_l
         # print(df_sub)
         # Plot the probability distribution
         # fig, ax = plt.subplots(1, 1, figsize=(8, 6))
