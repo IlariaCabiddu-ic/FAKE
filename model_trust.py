@@ -89,8 +89,14 @@ def compute_historical(df, topics):
         # plt.stem(samples,weight_l)
         # plt.show()
         # print(weight_l)
-        h = round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4)
-        H_st.append(h)  # divide by number of topic news P_st
+        h = list(df_sub['Weight_l'] * df_sub['Feedback'])
+        print(t, h)
+        plt.plot(h, linestyle='dotted')
+        plt.ylabel("Historical values", fontsize="18")
+        plt.xlabel("Historical samples", fontsize="18")
+        plt.title(("Historical plot", t), fontsize="18")
+        plt.show()
+        H_st.append(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4))  # divide by number of topic news P_st
         dictionary_H[t] = h
 
     return dictionary_H
