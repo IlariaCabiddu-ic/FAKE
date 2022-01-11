@@ -118,8 +118,8 @@ def compute_trust(expertise, goodwill, historical, topics):
     e = [x * sigma for x in list(expertise.values())]
     g = [x * gamma for x in list(goodwill.values())]
     h = [x * omega for x in list(historical.values())]
-    print(g)
     for i in range(len(topics)):
-        trust[i] = e[i] + g[i] + h[i]
+        print(i)
+        trust.append(e[i] + g[i] + h[i])
 
     return trust
