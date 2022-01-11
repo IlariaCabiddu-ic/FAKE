@@ -49,4 +49,9 @@ else:
     "Computation of the source goodwill"
     goodwill = model_trust.compute_goodwill(df=sub_df, topics=topics, relevance=relevance)
     print("The goodwill of analysed source is: ", goodwill)
+    historical = model_trust.compute_historical(df=sub_df, topics=topics)
+    # print("The historical of analysed source is: ", historical)
+    trust = model_trust.compute_trust(expertise=expertise, goodwill=goodwill,
+                                      historical=historical, topics=topics)
+    print("The trust of analysed source is: ", trust)
     
