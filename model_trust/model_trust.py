@@ -75,9 +75,11 @@ def compute_historical(df, topics):
         df_sub = df_sub.set_index('Datetime')
         df_sub = df_sub.sort_index(ascending=False)
         samples = np.arange(1, df_sub.shape[0]+1)
-        p = 0.3
-        # Calculate geometric probability distribution (WITHOUT THE FINITE UPPER BOUND)
+        p = 0.8
+        # Calculate geometric probability distribution (WITH THE FINITE UPPER BOUND)
         weight_l = geom.pmf(samples, p)
+        res = (1-sum(weight_l)) / len(weight_l)  # / len(weight_l)
+        weight_l = weight_l + res
         df_sub['Weight_l'] = weight_l
         # print(df_sub)
         # Plot the probability distribution
@@ -90,12 +92,12 @@ def compute_historical(df, topics):
         # plt.show()
         # print(weight_l)
         h = list(df_sub['Weight_l'] * df_sub['Feedback'])
-        print(t, h)
-        plt.plot(h, linestyle='dotted')
-        plt.ylabel("Historical values", fontsize="18")
-        plt.xlabel("Historical samples", fontsize="18")
-        plt.title(("Historical plot", t), fontsize="18")
-        plt.show()
+        # print(t, h)
+        # plt.plot(h, linestyle='dotted')
+        # plt.ylabel("Historical values", fontsize="18")
+        # plt.xlabel("Historical samples", fontsize="18")
+        # plt.title(("Historical plot", t), fontsize="18")
+        # plt.show()
         H_st.append(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4))  # divide by number of topic news P_st
         dictionary_H[t] = h
 
