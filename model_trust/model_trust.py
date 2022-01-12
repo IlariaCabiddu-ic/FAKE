@@ -78,7 +78,7 @@ def compute_historical(df, topics):
         p = 0.8
         # Calculate geometric probability distribution (WITH THE FINITE UPPER BOUND)
         weight_l = geom.pmf(samples, p)
-        res = (1-sum(weight_l)) / len(weight_l)  # / len(weight_l)
+        res = (1-sum(weight_l)) / len(weight_l)  # in order to have a unitary area
         weight_l = weight_l + res
         df_sub['Weight_l'] = weight_l
         # print(df_sub)
