@@ -29,11 +29,11 @@ def compute_expertise(df, topics):
     for t in topics:
         df_sub = df[df['Topic'] == t]  # iteration for the each topic
         q = list(df_sub['Message_based'])
-        sns.distplot(q, hist=False)
-        plt.ylabel("Pdf", fontsize="18")
-        plt.xlabel("Expertise samples", fontsize="18")
-        plt.title(("Expertise distribution", t), fontsize="18")
-        plt.show()
+        # sns.distplot(q, hist=False)
+        # plt.ylabel("Pdf", fontsize="18")
+        # plt.xlabel("Message based value", fontsize="18")
+        # plt.title("Technicality distribution for politics", fontsize="18")
+        # plt.show()
         Q_st.append(sum(df_sub['Message_based']) / (df_sub.shape[0]))  # divide by number of topic news P_st
         dictionary_Q[t] = sum(df_sub['Message_based']) / (df_sub.shape[0])
     zipped_lists = zip(list(M_st.values()), Q_st)
@@ -41,6 +41,13 @@ def compute_expertise(df, topics):
     expertise = [round(x, 2) for x in expertise]
     for t in range(len(topics)):
         dictionary_E[topics[t]] = expertise[t]
+    # keys = dictionary_E.keys()
+    # values = dictionary_E.values()
+
+    # plt.bar(keys, values)
+    # plt.ylabel("Expertise value", fontsize="18")
+    # plt.xlabel("Topics", fontsize="18")
+    # plt.show()
     return dictionary_E
 
 
@@ -59,14 +66,14 @@ def compute_goodwill(df, topics, relevance):
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
-        G_st.append(g / (df_sub.shape[0]))  # divide by number of topic news P_st
-        dictionary_G[t] = g / (df_sub.shape[0])
+        G_st.append(0.5*(1+(g / (df_sub.shape[0]))))  # divide by number of topic news P_st
+        dictionary_G[t] = 0.5*(1+(g / (df_sub.shape[0])))
     return dictionary_G
 
 
-def compute_historical(df, topics):
-    H_st = []
-    dictionary_H = {}
+def compute_coherence(df, topics):
+    C_st = []
+    dictionary_C = {}
     df_unique = df.drop_duplicates()
     datetimes = pd.to_datetime(df_unique['Datetime'])
     df_unique['Datetime'] = datetimes
@@ -74,6 +81,7 @@ def compute_historical(df, topics):
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         df_sub = df_sub.set_index('Datetime')
         df_sub = df_sub.sort_index(ascending=False)
+        # print(df_sub)
         samples = np.arange(1, df_sub.shape[0]+1)
         p = 0.8
         # Calculate geometric probability distribution (WITH THE FINITE UPPER BOUND)
@@ -91,28 +99,37 @@ def compute_historical(df, topics):
         # plt.stem(samples,weight_l)
         # plt.show()
         # print(weight_l)
-        h = list(df_sub['Weight_l'] * df_sub['Feedback'])
+        c = list(df_sub['Weight_l'] * df_sub['Feedback'])
         # print(t, h)
-        # plt.plot(h, linestyle='dotted')
-        # plt.ylabel("Historical values", fontsize="18")
-        # plt.xlabel("Historical samples", fontsize="18")
-        # plt.title(("Historical plot", t), fontsize="18")
+        # plt.plot(c, linestyle='dotted')
+        # plt.ylabel("Coherence values", fontsize="18")
+        # plt.xlabel("Coherence news samples", fontsize="18")
+        # plt.title(("Coherence plot", t), fontsize="18")
         # plt.show()
-        H_st.append(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4))  # divide by number of topic news P_st
-        dictionary_H[t] = h
+        C_st.append(0.5*(1+(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4))))  # divide by number of topic news P_st
+        dictionary_C[t] = 0.5*(1+(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4)))
 
-    return dictionary_H
+    return dictionary_C
 
 
-def compute_trust(expertise, goodwill, historical, topics):
+def compute_trust(expertise, goodwill, coherence, topics):
     trust = []
-    sigma = 0.3  # weight for expertise metric
-    omega = 0.2  # weight for historical metric
-    gamma = 0.5  # weight for goodwill metric
+    coherence_new = []
+    dictionary_T = {}
+    # for t in topics:
+    #     l = list(coherence[t])
+    #     hist = sum(l)/len(l)
+    #     coherence_new.append(hist)
+    # print(coherence_new)
+    sigma = 0.05  # weight for expertise metric
+    omega = 0.9  # weight for coherence metric
+    gamma = 0.05 # weight for goodwill metric
     e = [x * sigma for x in list(expertise.values())]
     g = [x * gamma for x in list(goodwill.values())]
-    h = [x * omega for x in list(historical.values())]
+    h = [x * omega for x in list(coherence.values())]
     for i in range(len(topics)):
         trust.append(e[i] + g[i] + h[i])
 
-    return trust
+    for t in range(len(topics)):
+        dictionary_T[topics[t]] = trust[t]
+    return dictionary_T
