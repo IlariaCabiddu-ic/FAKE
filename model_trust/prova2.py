@@ -43,7 +43,7 @@ dataframe = [('P1', 'source1', 'Politics', 0.7, 0.5, '2019-01-01 00:00:00'),
 
 # Create a DataFrame object
 df = pd.DataFrame(dataframe, columns=['ID', 'Source', 'Topic', 'Feedback', 'Message_based', 'Datetime'])
-"-----------------analyzing of each present source--------------"
+"-----------------analysis of each present source--------------"
 
 sources = list(df['Source'].unique())
 for s in sources:
