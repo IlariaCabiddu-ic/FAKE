@@ -1,4 +1,4 @@
-'''-----------Model trust------------'''
+"""-----------Model trust------------"""
 import collections
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,8 +8,8 @@ import seaborn as sns
 
 
 def compute_expertise(df, topics):
-    alfa = 0.5
-    beta = 0.5
+    alfa = 0.05
+    beta = 0.95
     Q_st = []
     dictionary_Q = {}
     dictionary_E = {}
@@ -32,7 +32,7 @@ def compute_expertise(df, topics):
         # sns.distplot(q, hist=False)
         # plt.ylabel("Pdf", fontsize="18")
         # plt.xlabel("Message based value", fontsize="18")
-        # plt.title("Technicality distribution for politics", fontsize="18")
+        # plt.title(("Technicality distribution", t), fontsize="18")
         # plt.show()
         Q_st.append(sum(df_sub['Message_based']) / (df_sub.shape[0]))  # divide by number of topic news P_st
         dictionary_Q[t] = sum(df_sub['Message_based']) / (df_sub.shape[0])
@@ -51,10 +51,16 @@ def compute_expertise(df, topics):
     return dictionary_E
 
 
-def compute_relevance(df):
-    dictionary_r = dict(zip(df['ID'].unique(), df.value_counts(['ID'])))
-    relevance = {k: v / total for total in (sum(dictionary_r.values()),)
-                 for k, v in dictionary_r.items()}  # normalization values
+def compute_relevance(df, topics):
+    relevance = {}
+    frequency_topic = list(df['Topic'].value_counts(sort=False))
+    # print(frequency_topic)
+    for t in topics:
+        df_topic= df[df['Topic'] == t]
+        dictionary_r = dict(zip(df_topic['ID'].unique(), df_topic.value_counts(['ID'])))
+        relevance.update({k: v /frequency_topic[topics.index(t)]
+                     for k, v in dictionary_r.items()})  # normalization values
+    # print(relevance)
     return relevance
 
 
@@ -66,8 +72,8 @@ def compute_goodwill(df, topics, relevance):
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
-        G_st.append(0.5*(1+(g / (df_sub.shape[0]))))  # divide by number of topic news P_st
-        dictionary_G[t] = 0.5*(1+(g / (df_sub.shape[0])))
+        G_st.append(0.5*(1+g))  # divide by number of topic news P_st
+        dictionary_G[t] = 0.5*(1+g)
     return dictionary_G
 
 
@@ -122,8 +128,8 @@ def compute_trust(expertise, goodwill, coherence, topics):
     #     coherence_new.append(hist)
     # print(coherence_new)
     sigma = 0.05  # weight for expertise metric
+    gamma = 0.05  # weight for goodwill metric
     omega = 0.9  # weight for coherence metric
-    gamma = 0.05 # weight for goodwill metric
     e = [x * sigma for x in list(expertise.values())]
     g = [x * gamma for x in list(goodwill.values())]
     h = [x * omega for x in list(coherence.values())]
