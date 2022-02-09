@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 from scipy.stats import geom
 import numpy as np
 import seaborn as sns
+import math
 
 
 def compute_expertise(df, topics):
-    alfa = 0.05
-    beta = 0.95
+    a = 0.3  # dominant parameter to the asymptotic value for the delta weight
+    b = 1  # dominant parameter for the trend rate to the asymptotic parameter
     Q_st = []
     dictionary_Q = {}
     dictionary_E = {}
@@ -28,7 +29,8 @@ def compute_expertise(df, topics):
     "Compute technicality Q_st"
     for t in topics:
         df_sub = df[df['Topic'] == t]  # iteration for the each topic
-        q = list(df_sub['Message_based'])
+        N_st = df_sub.shape[0]
+        # print(N_st)
         # sns.distplot(q, hist=False)
         # plt.ylabel("Pdf", fontsize="18")
         # plt.xlabel("Message based value", fontsize="18")
@@ -36,8 +38,14 @@ def compute_expertise(df, topics):
         # plt.show()
         Q_st.append(sum(df_sub['Message_based']) / (df_sub.shape[0]))  # divide by number of topic news P_st
         dictionary_Q[t] = sum(df_sub['Message_based']) / (df_sub.shape[0])
+    # print(M_st,Q_st)
+        delta = N_st/(abs((1/a)*N_st)+b)  # function1
+    #     delta = (a*N_st) / math.sqrt(b + N_st ** 2)  # function2
+    #     delta = a-a*math.exp(-b*N_st)  # funtion3
+        theta = 1 - delta
+        print(delta)
     zipped_lists = zip(list(M_st.values()), Q_st)
-    expertise = [alfa * x + beta*y for (x, y) in zipped_lists]
+    expertise = [delta * x + theta*y for (x, y) in zipped_lists]
     expertise = [round(x, 2) for x in expertise]
     for t in range(len(topics)):
         dictionary_E[topics[t]] = expertise[t]
@@ -78,6 +86,7 @@ def compute_goodwill(df, topics, relevance):
 
 
 def compute_coherence(df, topics):
+    N = 5  # nunmber of feedback samples
     C_st = []
     dictionary_C = {}
     df_unique = df.drop_duplicates()
@@ -87,6 +96,7 @@ def compute_coherence(df, topics):
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         df_sub = df_sub.set_index('Datetime')
         df_sub = df_sub.sort_index(ascending=False)
+        df_sub = df_sub[0:N]
         # print(df_sub)
         samples = np.arange(1, df_sub.shape[0]+1)
         p = 0.8
@@ -101,7 +111,7 @@ def compute_coherence(df, topics):
         # ax.plot(samples, weight_l, 'bo', ms=8, label='geom pmf')
         # plt.ylabel("Probability", fontsize="18")
         # plt.xlabel("Samples", fontsize="18")
-        # plt.title("Geometric Distribution", fontsize="18")
+        # plt.title(("Geometric Distribution", t), fontsize="18")
         # plt.stem(samples,weight_l)
         # plt.show()
         # print(weight_l)
@@ -127,12 +137,12 @@ def compute_trust(expertise, goodwill, coherence, topics):
     #     hist = sum(l)/len(l)
     #     coherence_new.append(hist)
     # print(coherence_new)
-    sigma = 0.05  # weight for expertise metric
-    gamma = 0.05  # weight for goodwill metric
-    omega = 0.9  # weight for coherence metric
-    e = [x * sigma for x in list(expertise.values())]
-    g = [x * gamma for x in list(goodwill.values())]
-    h = [x * omega for x in list(coherence.values())]
+    alfa = 0.1  # weight for expertise metric
+    beta = 0.5  # weight for goodwill metric
+    vartheta = 0.4  # weight for coherence metric
+    e = [x * alfa for x in list(expertise.values())]
+    g = [x * beta for x in list(goodwill.values())]
+    h = [x * vartheta for x in list(coherence.values())]
     for i in range(len(topics)):
         trust.append(e[i] + g[i] + h[i])
 
