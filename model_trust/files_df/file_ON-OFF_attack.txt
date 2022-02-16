@@ -66,7 +66,7 @@ dataframe = [
              ('P22', 'source2', 'Politics', -0.3, 0.1, '2012-02-22 22:22:22'),
              ('E23', 'source2', 'Economics', 0.4, 0.4, '2019-12-24 15:30:00')]
 
-#----------PERIODICO-----------------
+#----------PERIODIC attack-----------------
 dataframe =[('T140', 'source1', 'Tech', 0.8, 0.8, '2018-05-16 01:10:55'),
             ('T139', 'source1', 'Tech', 0.8, 0.8, '2018-07-13 01:10:55'),
             ('T138', 'source1', 'Tech', 0.9, 0.9, '2018-08-20 01:10:55'),
@@ -109,7 +109,7 @@ dataframe =[('T140', 'source1', 'Tech', 0.8, 0.8, '2018-05-16 01:10:55'),
             ('T11', 'source1', 'Tech', 0.7, 0.8, '2022-01-31 00:00:00') ]
 
 
-            #-----TEST SU QUANTO PENALIZZA LA SORGENTE------------
+            #-----model tests to quantify the source penalty------------
 dataframe = [
             ('T1120', 'source1', 'Tech', 0.8, 0.8, '2017-11-23 01:10:55'),
             ('T1119', 'source1', 'Tech', 0.8, 0.8, '2017-11-24 01:10:55'),
@@ -233,7 +233,7 @@ dataframe = [
             ('T11', 'source1', 'Tech', 0.7, 0.8, '2022-01-31 00:00:00') ]
 
 
-         #---------------PIÙ PENALIZZANTE-------------------------
+         #---------------more penalising (more consecutive fake news)-------------------------
 dataframe = [
             ('T1120', 'source1', 'Tech', 0.8, 0.8, '2017-11-23 01:10:55'),
             ('T1119', 'source1', 'Tech', 0.8, 0.8, '2017-11-24 01:10:55'),
