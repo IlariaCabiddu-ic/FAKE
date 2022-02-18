@@ -131,17 +131,17 @@ warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 #             ('T140', 'source1', 'Tech', 0.8, 0.8, '2018-05-16 01:10:55'),
 #             ('T139', 'source1', 'Tech', 0.8, 0.8, '2018-07-13 01:10:55'),
 #             ('T138', 'source1', 'Tech', 0.9, 0.9, '2018-08-20 01:10:55'),
-#             ('T137', 'source1', 'Tech',  -0.984, -0.984, '2018-09-18 01:10:55'),
-#             ('T136', 'source1', 'Tech',  -0.986, -0.986, '2018-10-17 01:10:55'),
-#             ('T135', 'source1', 'Tech', -0.984, -0.982, '2019-01-06 13:44:44'),
-#             ('T134', 'source1', 'Tech',  -0.984, -0.984, '2019-02-20 23:05:09'),
-#             ('T133', 'source1', 'Tech', -0.984, -0.984, '2019-03-30 14:30:40'),
-#             ('T132', 'source1', 'Tech', -0.82,-0.82, '2019-05-11 10:00:00'),
-#             ('T131', 'source1', 'Tech', -0.86,-0.86, '2019-06-01 00:00:00'),
-#             ('T130', 'source1', 'Tech', -0.82,-0.82, '2019-07-03 01:10:55'),
-#             ('T129', 'source1', 'Tech', -0.84,-0.84, '2019-07-13 01:10:55'),
-#             ('T128', 'source1', 'Tech', -0.84, -0.86, '2019-08-20 01:10:55'),
-#             ('T127', 'source1', 'Tech', -0.96,-0.96, '2019-09-18 01:10:55'),
+#             # ('T137', 'source1', 'Tech',  -0.984, -0.984, '2018-09-18 01:10:55'),
+#             # ('T136', 'source1', 'Tech',  -0.986, -0.986, '2018-10-17 01:10:55'),
+#             # ('T135', 'source1', 'Tech', -0.984, -0.982, '2019-01-06 13:44:44'),
+#             # ('T134', 'source1', 'Tech',  -0.984, -0.984, '2019-02-20 23:05:09'),
+#             # ('T133', 'source1', 'Tech', -0.984, -0.984, '2019-03-30 14:30:40'),
+#             # ('T132', 'source1', 'Tech', -0.82,-0.82, '2019-05-11 10:00:00'),
+#             # ('T131', 'source1', 'Tech', -0.86,-0.86, '2019-06-01 00:00:00'),
+#             # ('T130', 'source1', 'Tech', -0.82,-0.82, '2019-07-03 01:10:55'),
+#             # ('T129', 'source1', 'Tech', -0.84,-0.84, '2019-07-13 01:10:55'),
+#             # ('T128', 'source1', 'Tech', -0.84, -0.86, '2019-08-20 01:10:55'),
+#             # ('T127', 'source1', 'Tech', -0.96,-0.96, '2019-09-18 01:10:55'),
 #             ('T126', 'source1', 'Tech', -0.98,-0.98, '2019-10-01 01:10:55'),
 #             ('T125', 'source1', 'Tech', -0.98,-0.98, '2019-11-06 13:44:44'),
 #             ('T124', 'source1', 'Tech', -0.98,-0.98, '2019-12-20 23:05:09'),
@@ -323,37 +323,37 @@ for s in sources:
 # print(G)
 # print(C)
 # print(T)
-fig, axs = plt.subplots(4, 2, figsize=(10,8))
+fig, axs = plt.subplots(4, 2, figsize=(10,10))
 x = np.arange(1, len(E)+1)
 # print(x)
 axs[0, 0].plot(x, E)
 axs[0, 0].set_title('Expertise')
-axs[0, 0].set_ylim([0.4,1])
-axs[0, 0].set_yticks(np.arange(0.4, 1, step=0.1))
+axs[0, 0].set_ylim([0,1])
+axs[0, 0].set_yticks(np.arange(0, 1, step=0.1))
 
 axs[0, 1].plot(x, E)
 axs[0, 1].set_title('Expertise (zoom)')
 
 axs[1, 0].plot(x, G, 'tab:orange')
 axs[1, 0].set_title('Goodwill')
-axs[1, 0].set_ylim([0.4,1])
-axs[1, 0].set_yticks(np.arange(0.4, 1, step=0.1))
+axs[1, 0].set_ylim([0,1])
+axs[1, 0].set_yticks(np.arange(0, 1, step=0.1))
 
 axs[1, 1].plot(x, G, 'tab:orange')
 axs[1, 1].set_title('Goodwill (zoom)')
 
 axs[2, 0].plot(x, C, 'tab:green')
 axs[2, 0].set_title('Coherence behaviour')
-axs[2, 0].set_ylim([0.4,1])
-axs[2, 0].set_yticks(np.arange(0.4, 1, step=0.1))
+axs[2, 0].set_ylim([0,1])
+axs[2, 0].set_yticks(np.arange(0, 1, step=0.1))
 
 axs[2, 1].plot(x, C, 'tab:green')
 axs[2, 1].set_title('Coherence behaviour (zoom)')
 
 axs[3, 0].plot(x, T, 'tab:red')
 axs[3, 0].set_title('Trust')
-axs[3, 0].set_ylim([0.4,1])
-axs[3, 0].set_yticks(np.arange(0.4, 1, step=0.1))
+axs[3, 0].set_ylim([0,1])
+axs[3, 0].set_yticks(np.arange(0, 1, step=0.1))
 
 axs[3, 1].plot(x, T, 'tab:red')
 axs[3, 1].set_title('Trust (zoom)')
