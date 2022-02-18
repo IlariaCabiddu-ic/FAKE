@@ -10,13 +10,14 @@ import math
 
 def compute_expertise(df, topics):
     a = 0.3  # dominant parameter to the asymptotic value for the delta weight
-    b = 1  # dominant parameter for the trend rate to the asymptotic parameter
+    b = 5.649  # dominant parameter for the trend rate to the asymptotic parameter (when N_st is 100)
     Q_st = []
     dictionary_Q = {}
     dictionary_E = {}
 
     '''computation of M_st that is a percentage number of published news items 
         of a specific topic compared to the total number of news items of a source'''
+    df["Message_based_converted"] = (df["Message_based"] + 1) / 2
     df = df.drop_duplicates()
     "Compute focus theme M_st"
     M_st = df['Topic'].to_list()
@@ -36,14 +37,14 @@ def compute_expertise(df, topics):
         # plt.xlabel("Message based value", fontsize="18")
         # plt.title(("Technicality distribution", t), fontsize="18")
         # plt.show()
-        Q_st.append(sum(df_sub['Message_based']) / (df_sub.shape[0]))  # divide by number of topic news P_st
-        dictionary_Q[t] = sum(df_sub['Message_based']) / (df_sub.shape[0])
+        Q_st.append(sum(df_sub['Message_based_converted']) / (df_sub.shape[0]))  # divide by number of topic news P_st
+        dictionary_Q[t] = sum(df_sub['Message_based_converted']) / (df_sub.shape[0])
     # print(M_st,Q_st)
         delta = N_st/(abs((1/a)*N_st)+b)  # function1
     #     delta = (a*N_st) / math.sqrt(b + N_st ** 2)  # function2
     #     delta = a-a*math.exp(-b*N_st)  # funtion3
         theta = 1 - delta
-        print(delta)
+        # print(delta)
     zipped_lists = zip(list(M_st.values()), Q_st)
     expertise = [delta * x + theta*y for (x, y) in zipped_lists]
     expertise = [round(x, 2) for x in expertise]
@@ -65,7 +66,7 @@ def compute_relevance(df, topics):
     # print(frequency_topic)
     for t in topics:
         df_topic= df[df['Topic'] == t]
-        dictionary_r = dict(zip(df_topic['ID'].unique(), df_topic.value_counts(['ID'])))
+        dictionary_r = dict(zip(df_topic['ID'].unique(), df_topic['ID'].value_counts(sort=False)))
         relevance.update({k: v /frequency_topic[topics.index(t)]
                      for k, v in dictionary_r.items()})  # normalization values
     # print(relevance)
@@ -75,8 +76,9 @@ def compute_relevance(df, topics):
 def compute_goodwill(df, topics, relevance):
     G_st = []
     dictionary_G = {}
-    df_unique = df.drop_duplicates()
+    df_unique = df.drop_duplicates(subset=['ID', 'Source', 'Topic', 'Feedback', 'Message_based'], keep='last')
     df_unique['Relevance'] = df_unique['ID'].map(relevance)
+    # print(df_unique)
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
@@ -84,9 +86,21 @@ def compute_goodwill(df, topics, relevance):
         dictionary_G[t] = 0.5*(1+g)
     return dictionary_G
 
+def compute_goodwill_witohut_relevance(df, topics):
+    G_st = []
+    dictionary_G = {}
+    df_unique = df.drop_duplicates(subset=['ID', 'Source', 'Topic', 'Feedback', 'Message_based'], keep='last')
+    df_unique['Relevance'] = 1/df_unique.shape[0]
+    # print(df_unique)
+    for t in topics:
+        df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
+        g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
+        G_st.append(0.5*(1+g))  # divide by number of topic news P_st
+        dictionary_G[t] = 0.5*(1+g)
+    return dictionary_G
 
 def compute_coherence(df, topics):
-    N = 5  # nunmber of feedback samples
+    L = 50  # number of feedback samples
     C_st = []
     dictionary_C = {}
     df_unique = df.drop_duplicates()
@@ -96,10 +110,10 @@ def compute_coherence(df, topics):
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         df_sub = df_sub.set_index('Datetime')
         df_sub = df_sub.sort_index(ascending=False)
-        df_sub = df_sub[0:N]
+        df_sub = df_sub[0:L-1]
         # print(df_sub)
         samples = np.arange(1, df_sub.shape[0]+1)
-        p = 0.8
+        p = 0.19
         # Calculate geometric probability distribution (WITH THE FINITE UPPER BOUND)
         weight_l = geom.pmf(samples, p)
         res = (1-sum(weight_l)) / len(weight_l)  # in order to have a unitary area
@@ -137,9 +151,9 @@ def compute_trust(expertise, goodwill, coherence, topics):
     #     hist = sum(l)/len(l)
     #     coherence_new.append(hist)
     # print(coherence_new)
-    alfa = 0.1  # weight for expertise metric
-    beta = 0.5  # weight for goodwill metric
-    vartheta = 0.4  # weight for coherence metric
+    alfa = 0.1 # weight for expertise metric
+    beta = 0.1  # weight for goodwill metric
+    vartheta = 0.8  # weight for coherence metric
     e = [x * alfa for x in list(expertise.values())]
     g = [x * beta for x in list(goodwill.values())]
     h = [x * vartheta for x in list(coherence.values())]
