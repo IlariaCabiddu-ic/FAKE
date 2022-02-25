@@ -8,9 +8,10 @@ import seaborn as sns
 import math
 
 
+
 def compute_expertise(df, topics):
-    a = 0.3  # dominant parameter to the asymptotic value for the delta weight
-    b = 5.649  # dominant parameter for the trend rate to the asymptotic parameter (when N_st is 100)
+    a = 0.1  # dominant parameter to the asymptotic value for the delta weight
+    b = 1  # dominant parameter for the trend rate to the asymptotic parameter (when N_st is 100 we have an 80% of 0.3)
     Q_st = []
     dictionary_Q = {}
     dictionary_E = {}
@@ -37,8 +38,8 @@ def compute_expertise(df, topics):
         # plt.xlabel("Message based value", fontsize="18")
         # plt.title(("Technicality distribution", t), fontsize="18")
         # plt.show()
-        Q_st.append(sum(df_sub['Message_based_converted']) / (df_sub.shape[0]))  # divide by number of topic news P_st
-        dictionary_Q[t] = sum(df_sub['Message_based_converted']) / (df_sub.shape[0])
+        Q_st.append(sum(df_sub['Message_based_converted']) / (df_sub.shape[0]+1))  # divide by number of topic news P_st
+        dictionary_Q[t] = sum(df_sub['Message_based_converted']) / (df_sub.shape[0]+1)
     # print(M_st,Q_st)
         delta = N_st/(abs((1/a)*N_st)+b)  # function1
     #     delta = (a*N_st) / math.sqrt(b + N_st ** 2)  # function2
@@ -113,10 +114,10 @@ def compute_coherence(df, topics):
         df_sub = df_sub[0:L-1]
         # print(df_sub)
         samples = np.arange(1, df_sub.shape[0]+1)
-        p = 0.19
+        p = 0.03
         # Calculate geometric probability distribution (WITH THE FINITE UPPER BOUND)
         weight_l = geom.pmf(samples, p)
-        res = (1-sum(weight_l)) / len(weight_l)  # in order to have a unitary area
+        res = (1-sum(weight_l)) / (len(weight_l)+1)  # in order to have a unitary area
         weight_l = weight_l + res
         df_sub['Weight_l'] = weight_l
         # print(df_sub)
