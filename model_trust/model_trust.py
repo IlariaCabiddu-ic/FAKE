@@ -77,12 +77,25 @@ def compute_relevance(df, topics):
 def compute_goodwill(df, topics, relevance):
     G_st = []
     dictionary_G = {}
-    df_unique = df.drop_duplicates(subset=['ID', 'Source', 'Topic', 'Feedback', 'Message_based'], keep='last')
+    df_unique = df.drop_duplicates(subset=['ID', 'Source', 'Topic', 'Feedback', 'Message_based','label'], keep='last')
     df_unique['Relevance'] = df_unique['ID'].map(relevance)
     # print(df_unique)
     for t in topics:
         df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
         g = round(sum(df_sub['Relevance'] * df_sub['Feedback']), 4)
+        G_st.append(0.5*(1+g))  # divide by number of topic news P_st
+        dictionary_G[t] = 0.5*(1+g)
+    return dictionary_G
+
+def compute_goodwill_with_label(df, topics, relevance):
+    G_st = []
+    dictionary_G = {}
+    df_unique = df.drop_duplicates(subset=['ID', 'Source', 'Topic', 'Feedback', 'Message_based','label'], keep='last')
+    df_unique['Relevance'] = df_unique['ID'].map(relevance)
+    # print(df_unique)
+    for t in topics:
+        df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
+        g = round(sum(df_sub['Relevance'] * df_sub['label']), 4)
         G_st.append(0.5*(1+g))  # divide by number of topic news P_st
         dictionary_G[t] = 0.5*(1+g)
     return dictionary_G
@@ -139,6 +152,48 @@ def compute_coherence(df, topics):
         # plt.show()
         C_st.append(0.5*(1+(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4))))  # divide by number of topic news P_st
         dictionary_C[t] = 0.5*(1+(round(sum(df_sub['Weight_l'] * df_sub['Feedback']), 4)))
+
+    return dictionary_C
+
+def compute_coherence_with_label(df, topics):
+    L = 50  # number of feedback samples
+    C_st = []
+    dictionary_C = {}
+    df_unique = df.drop_duplicates()
+    datetimes = pd.to_datetime(df_unique['Datetime'])
+    df_unique['Datetime'] = datetimes
+    for t in topics:
+        df_sub = df_unique[df_unique['Topic'] == t]  # iteration for the each topic
+        df_sub = df_sub.set_index('Datetime')
+        df_sub = df_sub.sort_index(ascending=False)
+        df_sub = df_sub[0:L-1]
+        # print(df_sub)
+        samples = np.arange(1, df_sub.shape[0]+1)
+        p = 0.03
+        # Calculate geometric probability distribution (WITH THE FINITE UPPER BOUND)
+        weight_l = geom.pmf(samples, p)
+        res = (1-sum(weight_l)) / (len(weight_l)+1)  # in order to have a unitary area
+        weight_l = weight_l + res
+        df_sub['Weight_l'] = weight_l
+        # print(df_sub)
+        # Plot the probability distribution
+        # fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+        # ax.plot(samples, weight_l, 'bo', ms=8, label='geom pmf')
+        # plt.ylabel("Probability", fontsize="18")
+        # plt.xlabel("Samples", fontsize="18")
+        # plt.title(("Geometric Distribution", t), fontsize="18")
+        # plt.stem(samples,weight_l)
+        # plt.show()
+        # print(weight_l)
+        c = list(df_sub['Weight_l'] * df_sub['label'])
+        # print(t, h)
+        # plt.plot(c, linestyle='dotted')
+        # plt.ylabel("Coherence values", fontsize="18")
+        # plt.xlabel("Coherence news samples", fontsize="18")
+        # plt.title(("Coherence plot", t), fontsize="18")
+        # plt.show()
+        C_st.append(0.5*(1+(round(sum(df_sub['Weight_l'] * df_sub['label']), 4))))  # divide by number of topic news P_st
+        dictionary_C[t] = 0.5*(1+(round(sum(df_sub['Weight_l'] * df_sub['label']), 4)))
 
     return dictionary_C
 
