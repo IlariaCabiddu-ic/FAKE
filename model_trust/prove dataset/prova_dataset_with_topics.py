@@ -3,7 +3,7 @@ import numpy as np
 import warnings
 from pandas.core.common import SettingWithCopyWarning
 import matplotlib.pyplot as plt
-from itertools import chain
+from itertools import chain,groupby
 import model_trust
 import utils
 
@@ -20,10 +20,8 @@ start = pd.to_datetime('2018-01-01')
 end = pd.to_datetime('2022-02-01')
 
 dataframe = pd.read_csv('../Dataset/TEST_01_with_topics.csv')
-df = dataframe[["source", "label", "message-based","mainTopic"]]
+df = dataframe[["source", "label", "message-based","mainTopic","label"]]
 df = df.rename(columns={"source":"Source", "label":"label", "message-based":"Message_based", "mainTopic":"Topic"})
-# df = df.loc[0:199]
-# print(d)
 df["Feedback"] = df["Message_based"]
 # topics = pd.Series(['Economics','Politics', 'Tech', 'Actuality'])
 # topics= topics.repeat((df.shape[0]/topics.shape[0])+1)
@@ -50,6 +48,10 @@ for s in sources:
     sub_g = []
     sub_c = []
     sub_t = []
+    sube = []
+    subg = []
+    subc = []
+    subt = []
     E = []
     G = []
     C = []
@@ -88,6 +90,12 @@ for s in sources:
         sub_g.append(list(chain(sub_good[k] for sub_good in G)))
         sub_c.append(list(chain(sub_coh[k] for sub_coh in C)))
         sub_t.append(list(chain(sub_tru[k] for sub_tru in T)))
+
+    for h in range(len(sub_e)):
+        sube.append(list(key for key, _ in groupby(sub_e[h])))
+        subg.append(list(key for key, _ in groupby(sub_g[h])))
+        subc.append(list(key for key, _ in groupby(sub_c[h])))
+        # subt.append(list(key for key, _ in groupby(sub_t[h])))
     # fig, axs = plt.subplots(4, 2, figsize=(10, 10))
     # x = np.arange(0, len(sub_et))
     # for e in sub_e:
@@ -128,27 +136,31 @@ for s in sources:
     #     ax.set(xlabel='News requests during the time', ylabel='Metric value')
     #     ax.legend(df['Topic'].unique(), loc='lower right')
     fig, axs = plt.subplots(4, 1, figsize=(12, 12))
-    x = np.arange(0, len(sub_et))
+
     for e in sub_e:
-        axs[0].plot(x, e)
+        xe = np.arange(0, len(e))
+        axs[0].plot(xe, e)
     axs[0].set_title('Expertise')
     axs[0].set_ylim([0, 1])
     axs[0].set_yticks(np.arange(0, 1, step=0.1))
-    for g in sub_g:
-        axs[1].plot(x, g)
+    for g in subg:
+        xg = np.arange(0, len(g))
+        axs[1].plot(xg, g)
     axs[1].set_title('Goodwill')
     axs[1].set_ylim([0, 1])
     axs[1].set_yticks(np.arange(0, 1, step=0.1))
 
 
-    for c in sub_c:
-        axs[2].plot(x, c)
+    for c in subc:
+        xc = np.arange(0, len(c))
+        axs[2].plot(xc, c)
     axs[2].set_title('Coherence behaviour')
     axs[2].set_ylim([0, 1])
     axs[2].set_yticks(np.arange(0, 1, step=0.1))
 
     for t in sub_t:
-        axs[3].plot(x, t)
+        xt = np.arange(0, len(t))
+        axs[3].plot(xt, t)
     axs[3].set_title('Trust')
     axs[3].set_ylim([0, 1])
     axs[3].set_yticks(np.arange(0, 1, step=0.1))
