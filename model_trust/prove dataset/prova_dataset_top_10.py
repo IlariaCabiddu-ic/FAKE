@@ -1,3 +1,6 @@
+"""This file is used to create a ranking of best sources for each topic.
+Moreover, the trust value in relation to the number of fake news stories
+and the average feedback is taken into account """
 import pandas as pd
 import numpy as np
 import warnings
