@@ -1,3 +1,4 @@
+"""This file is used to test different weights (α,β,ϑ) of the trust weighted sum """
 import pandas as pd
 import numpy as np
 import warnings
