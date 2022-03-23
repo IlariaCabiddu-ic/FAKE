@@ -1,3 +1,4 @@
+"""In this file the trust model is tested by the using a part of a kaggle dataset"""
 import pandas as pd
 import numpy as np
 import warnings
